@@ -6,7 +6,15 @@ from datetime import datetime
 
 
 def load_json(data_file:str) -> dict:
-    """ """
+    """Load data from a json file and return it as a dict
+
+    Args:
+        - data_file (str) : path to data file
+
+    Returns:
+        - (dict) : structured data
+    
+    """
 
     # load data
     with open(data_file, 'r', encoding='utf-8') as file:
@@ -18,20 +26,28 @@ def load_json(data_file:str) -> dict:
 
 
 def display_timeline(data:dict):
-    """ """
+    """Craft a timeline representation of sejour
+
+    Args:
+        - data (dict) : structured data of a sejour
     
-    # Liste pour stocker tous les événements
+    """
+    
+    # init event list
     events = []
     
-    # Extraction et traitement des événements des actes
+    # Extract actes and associated timestamp
     for event in data.get('actes', []):
+
         # Conversion du timestamp en objet datetime (gestion du "Z" pour UTC)
         dt = datetime.fromisoformat(event['timestamp'].replace('Z', '+00:00'))
         label = f"Acte: {event['ccam']}"
         events.append({'datetime': dt, 'label': label, 'type': 'acte'})
     
-    # Extraction et traitement des événements du diagnostic
+    # Extract diag and associated timestamp
     for event in data.get('diagnostic', []):
+
+        # Conversion du timestamp en objet datetime (gestion du "Z" pour UTC)
         dt = datetime.fromisoformat(event['timestamp'].replace('Z', '+00:00'))
         label = f"Diagnostic: {event['cim10']}"
         events.append({'datetime': dt, 'label': label, 'type': 'diagnostic'})
@@ -49,9 +65,11 @@ def display_timeline(data:dict):
     
     # Affichage de chaque événement sur la frise
     for event in events:
+        
         # Choix de la couleur en fonction du type d'événement
         color = 'blue' if event['type'] == 'acte' else 'red'
         ax.plot(event['datetime'], 1, "o", markersize=8, color=color)
+        
         # Annotation de l'événement
         ax.text(event['datetime'], 1.05, event['label'], rotation=45,
                 ha='left', va='bottom', fontsize=9)
@@ -64,6 +82,7 @@ def display_timeline(data:dict):
     # Masquage de l'axe des y
     ax.get_yaxis().set_visible(False)
     
+    # generate figure
     plt.title("Frise chronologique des événements")
     plt.tight_layout()
     plt.show()
